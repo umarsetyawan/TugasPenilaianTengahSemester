@@ -1,5 +1,6 @@
 package me.umarsetyawan.tugaspts;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Adapter adapter;
     List<User> userlist = new ArrayList<>();
-
+    ActionBar actionBar;
 
 
     @Override
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Realm realm = Realm.getDefaultInstance();
         setTitle("User List");
+        actionBar = getSupportActionBar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         recyclerView = findViewById(R.id.rvdata);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -74,6 +77,16 @@ public class MainActivity extends AppCompatActivity {
                         recyclerView.setAdapter(adapter);
                     }
                 });
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
 }

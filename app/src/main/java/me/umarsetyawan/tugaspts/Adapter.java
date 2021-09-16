@@ -49,33 +49,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.posisi = position;
         holder.email.setText(users.get(position).getEmail());
-        User userFind = Realm.getDefaultInstance().where(User.class).equalTo("email", users.get(position).getEmail()).findFirst();
-        if (userFind == null) holder.fav.setImageResource(R.drawable.hollowstar);
-        else holder.fav.setImageResource(R.drawable.star);
-        holder.fav.setOnClickListener(view -> {
-            User userAdded = Realm.getDefaultInstance().where(User.class).equalTo("email", users.get(position).getEmail()).findFirst();
-            if (userAdded == null) {
-                User user = users.get(position);
-                Realm.getDefaultInstance().executeTransactionAsync(realm -> {
-                    realm.copyToRealm(user);
-                }, () -> {
-                    holder.fav.setImageResource(R.drawable.star);
-                }, error -> {
-                    holder.fav.setImageResource(R.drawable.hollowstar);
-                });
-            }else {
-                User user = users.get(position);
-                Realm.getDefaultInstance().executeTransactionAsync(realm -> {
-                    Objects.requireNonNull(realm.where(User.class).equalTo("email", users.get(position).getEmail()).findFirst()).deleteFromRealm();
-                }, () -> {
-                    holder.fav.setImageResource(R.drawable.hollowstar);
-                }, error -> {
-                    holder.fav.setImageResource(R.drawable.star);
-                });
-            }
-
-        });
         holder.name.setText(users.get(position).getFirstName() + " " + users.get(position).getLastName());
         AndroidNetworking.get(users.get(position)
                 .getAvatar())
@@ -106,7 +81,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final TextView email, name;
         private final ImageView avatar;
-        private final ImageView fav;
+        private int posisi;
         ItemClickListener itemClickListener;
 
         public ViewHolder(@NonNull View itemView) {
@@ -115,7 +90,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             email = itemView.findViewById(R.id.email);
             name = itemView.findViewById(R.id.name);
             avatar = itemView.findViewById(R.id.avatar);
-            fav = itemView.findViewById(R.id.fav_image);
 
             itemView.setOnClickListener(this);
         }
@@ -133,6 +107,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             bundle.putString("email", email.getText().toString());
             bundle.putString("name", name.getText().toString());
             bundle.putByteArray("avatar", bytes);
+            bundle.putString("Avatar_url", users.get(posisi).getAvatar());
             Intent intent = new Intent(activity, DetailActivity.class);
             intent.putExtras(bundle);
             activity.startActivity(intent);
