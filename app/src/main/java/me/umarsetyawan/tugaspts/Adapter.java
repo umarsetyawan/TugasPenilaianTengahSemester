@@ -108,9 +108,11 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             bundle.putString("name", name.getText().toString());
             bundle.putByteArray("avatar", bytes);
             bundle.putString("Avatar_url", users.get(posisi).getAvatar());
+            bundle.putString("activity", activity.getLocalClassName());
             Intent intent = new Intent(activity, DetailActivity.class);
             intent.putExtras(bundle);
             activity.startActivity(intent);
+            activity.finish();
         }
     }
 }

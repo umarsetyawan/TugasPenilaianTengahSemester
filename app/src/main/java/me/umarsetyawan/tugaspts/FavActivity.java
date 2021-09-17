@@ -22,6 +22,7 @@ public class FavActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fav);
         recyclerView = findViewById(R.id.rvdata);
+        getSupportActionBar().setTitle("Favorite List");
         actionBar = getSupportActionBar();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

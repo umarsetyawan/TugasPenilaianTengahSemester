@@ -33,8 +33,8 @@ public class DetailActivity extends AppCompatActivity {
         avatar = findViewById(R.id.ImageView);
         favbtn = findViewById(R.id.fav_add);
 
-        actionBar = getSupportActionBar();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //actionBar = getSupportActionBar();
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         Bundle bundle = getIntent().getExtras();
@@ -42,6 +42,7 @@ public class DetailActivity extends AppCompatActivity {
         String emailtxt = bundle.getString("email");
         String nametxt = bundle.getString("name");
         String avatarurl = bundle.getString("Avatar_url");
+        String activity = bundle.getString("activity");
 
         byte[] mBytes = bundle.getByteArray("avatar");
         Bitmap bitmap = BitmapFactory.decodeByteArray(mBytes, 0, mBytes.length);
@@ -50,6 +51,14 @@ public class DetailActivity extends AppCompatActivity {
         name.setText(nametxt);
         avatar.setImageBitmap(bitmap);
         String[] namefull = nametxt.split(" ");
+        User userAdded = Realm.getDefaultInstance().where(User.class).equalTo("email", emailtxt).findFirst();
+        if(userAdded == null)
+        {
+            favbtn.setText("Add to Favorite");
+
+        }else {
+            favbtn.setText("Delete from Favorite");
+        }
 
         favbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,14 +66,33 @@ public class DetailActivity extends AppCompatActivity {
                 User userFind = Realm.getDefaultInstance().where(User.class).equalTo("email", emailtxt).findFirst();
                 if(userFind == null)
                 {
-                    Toast.makeText(DetailActivity.this, "Profile have been successfully added", Toast.LENGTH_SHORT).show();
                     Realm.getDefaultInstance().executeTransactionAsync(realm -> {
                         realm.copyToRealm(new User(emailtxt, namefull[0], namefull[1], avatarurl));
+                    }, () -> {
+                        Toast.makeText(DetailActivity.this, "Profile have been successfully added", Toast.LENGTH_SHORT).show();
+                    }, error -> {
+                        Toast.makeText(DetailActivity.this, "Failed to add profile", Toast.LENGTH_SHORT).show();
                     });
+                    if (activity.equals("MainActivity")){
+                        startActivity(new Intent(DetailActivity.this, MainActivity.class));
+                    }else{
+                        startActivity(new Intent(DetailActivity.this, FavActivity.class));
+                    }
+                    finish();
                 }else {
                     Realm.getDefaultInstance().executeTransactionAsync(realm -> {
                         Realm.getDefaultInstance().where(User.class).equalTo("email", emailtxt).findFirst().deleteFromRealm();
+                    }, () -> {
+                        Toast.makeText(DetailActivity.this, "Profile have been removed", Toast.LENGTH_SHORT).show();
+                    }, error -> {
+                        Toast.makeText(DetailActivity.this, "Failed to remove profile", Toast.LENGTH_SHORT).show();
                     });
+                    if (activity.equals("MainActivity")){
+                        startActivity(new Intent(DetailActivity.this, MainActivity.class));
+                    }else{
+                        startActivity(new Intent(DetailActivity.this, FavActivity.class));
+                    }
+                    finish();
                 }
             }
         });
